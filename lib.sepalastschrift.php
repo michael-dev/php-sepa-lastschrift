@@ -55,10 +55,13 @@ class SEPALastschrift {
 
   /**
    * Lastschrift einfügen.
+   * @param name Kontoinhaber
    * @param amount maximal 2 Bruchziffern, float
    * @param mandateSignatureDate Datum der Unterschrift auf dem Mandat; als class DateTime Object
-   * @param sepatyp FRST RCUR OOFF FNAL */
-  public function addLastschrift($id, $iban, $bic, $name, $mandate, $mandateSignatureDate /* class DateTime */, $amount /* float */, $subject, $type) {
+   * @param sepatyp FRST RCUR OOFF FNAL
+   * @param UltmtDbtr Name des Schuldners (nur Information; wenn abweichend von Kontoinhaber) (optional)
+   */
+  public function addLastschrift($id, $iban, $bic, $name, $mandate, $mandateSignatureDate /* class DateTime */, $amount /* float */, $subject, $type, $UltmtDbtr = NULL) {
     if (!preg_match("#^([A-Za-z0-9]|[\+|\?|/|\-|:|\(|\)|\.|,|'| ]){1,35}$#", $id))
       die("invalid id $id");
     if (!preg_match("#^([A-Za-z0-9]|[\+|\?|/|\-|:|\(|\)|\.|,|']){1,35}$#", $mandate))
@@ -69,6 +72,7 @@ class SEPALastschrift {
     $amount = (int) ($amount * 100);
     if (!in_array($type, $this->txTypes)) die("invalid type $type");
     $tx = Array("id" => $id, "IBAN" => $iban, "BIC" => $bic, "name" => $name, "mandate" => $mandate, "mandateSignatureDate" => $mandateSignatureDate, "amount" => $amount, "subject" => $subject);
+    if ($UltmtDbtr !== NULL) $ts["UltmtDbtr"] = $UltmtDbtr;
     if (!isset($this->txs[$type])) $this->txs[$type] = Array();
     $this->txs[$type][] = $tx;
     if (!isset($this->sum[$type])) $this->sum[$type] = 0;
@@ -180,9 +184,11 @@ class SEPALastschrift {
        $xml->writeElement('IBAN',$tx["IBAN"]);
       $xml->endElement(); /* Id */
      $xml->endElement(); /* DbtrAcct */
-     $xml->startElement('UltmtDbtr');
-      $xml->writeElement('Nm',$tx["name"]); /* Zahlungspflichtiger, falls vom Kontoinhaber abweichend */
-     $xml->endElement(); /* UltmtDbtr */
+     if (isset($tx["UltmtDbtr"])) {
+      $xml->startElement('UltmtDbtr');
+       $xml->writeElement('Nm',$tx["UltmtDbtr"]); /* Zahlungspflichtiger, falls vom Kontoinhaber abweichend */
+      $xml->endElement(); /* UltmtDbtr */
+     }
      $xml->startElement('RmtInf');
       $xml->writeElement('Ustrd',$tx["subject"]);
      $xml->endElement(); /* RmtInf */
