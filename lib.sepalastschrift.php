@@ -68,6 +68,10 @@ class SEPALastschrift {
       die("invalid mandate $mandate");
     if (strlen($subject) < 1 or strlen($subject) > 140)
      die("invalid subject length");
+    if (strlen($name) < 1 or strlen($name) > 70)
+     die("invalid name length");
+    if ($UltmtDbtr !== NULL && (strlen($UltmtDbtr) < 1 or strlen($UltmtDbtr) > 70))
+     die("invalid UltmtDbtr length");
     if ($amount < 0.01 || $amount > 999999999.99) die("invalid amount $amount");
     $amount = (int) ($amount * 100);
     if (!in_array($type, $this->txTypes)) die("invalid type $type");
