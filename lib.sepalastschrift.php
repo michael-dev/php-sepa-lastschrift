@@ -197,7 +197,7 @@ class SEPALastschrift {
 
    $xml->startElement('Document');
    $xml->writeAttribute('xmlns','urn:iso:std:iso:20022:tech:xsd:pain.008.003.02');
-   $xml->writeAttributeNS('xsi','schemaLocation','http://www.w3.org/2001/XMLSchema-instance','urn:iso:std:iso:20022:tech:xsd:pain.008.003.02 pain.008.00.02.xsd');
+   $xml->writeAttributeNS('xsi','schemaLocation','http://www.w3.org/2001/XMLSchema-instance','urn:iso:std:iso:20022:tech:xsd:pain.008.003.02 pain.008.03.02.xsd');
     $xml->startElement('CstmrDrctDbtInitn');
      $this->addGrpHdr($xml);
      foreach ($this->txs as $type => $txs) {
