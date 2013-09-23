@@ -10,5 +10,5 @@ $lastschriften->addLastschrift("randomtxid2", "9871", "9871", "Test Me2", "Manda
 $lastschriften->addLastschrift("randomtxid3", "9872", "BIC9873", "Test Me3", "Mandate-Id123", new DateTime("2013-05-22"), 44.00, "blabla SSS","RCUR");
 
 header("Content-type: text/xml");
-echo $lastschriften->toXMLString();
+echo $lastschriften->asXML();
 

@@ -201,7 +201,7 @@ class SEPALastschrift {
     $xml->endElement(); /* DrctDbtTxInf */
   }
 
-  public function toXMLString() {
+  public function asXML() {
     /** output */
    $xml = new XMLWriter;
    $xml->openMemory();
