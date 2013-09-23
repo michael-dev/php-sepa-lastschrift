@@ -25,6 +25,7 @@
 /**
  * Diese Klasse implementiert pain.008.003.02
  * für SEPA Lastschriften
+ * Payment-Id := <Message-Id>-<Type>
  */
 class SEPALastschrift {
   private $date; /* Y-m-d\TH:i:s\Z */
