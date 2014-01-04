@@ -22,6 +22,9 @@
  * https://github.com/michael-dev/php-sepa-lastschrift
  */
 
+global $sepaLastschriftXMLVersion; # 008.002.02
+global $sepaLastschriftXSD; # ../media/
+
 /**
  * Diese Klasse implementiert pain.008.003.02
  * für SEPA Lastschriften
@@ -71,6 +74,9 @@ class SEPALastschrift {
       die("invalid mandate $mandate");
     if (strlen($subject) < 1 or strlen($subject) > 140)
      die("invalid subject length");
+    # Sparkasse Arnstadt-Ilmenau erlaubt hier nur a-zA-Z0-9 sowie -':?,+()/. und Leerzeichen
+    if (!preg_match("#^([A-Za-z0-9]|[\+|\?|/|\-|:|\(|\)|\.|,|']| ){1,140}$#", $subject))
+      die("invalid subject $subject: #^([A-Za-z0-9]|[\+|\?|/|\-|:|\(|\)|\.|,|']| ){1,140}$#");
     if (strlen($name) < 1 or strlen($name) > 70)
      die("invalid name length");
     if ($UltmtDbtr !== NULL && (strlen($UltmtDbtr) < 1 or strlen($UltmtDbtr) > 70))
@@ -103,7 +109,7 @@ class SEPALastschrift {
      foreach ($this->sum as $v) {
        $sum += $v;
      }
-     $xml->writeElement('ControlSum', $this->formatCcy($sum));
+     $xml->writeElement('CtrlSum', $this->formatCcy($sum));
      $xml->startElement('InitgPty');
       $xml->writeElement('Nm', $this->initiator);
      $xml->endElement(); /* InitgPty */
@@ -119,7 +125,7 @@ class SEPALastschrift {
      $xml->writeElement('PmtInfId', $this->msgid.'-'.$type);
      $xml->writeElement('PmtMtd','DD');
      $xml->writeElement('NbOfTxs', count($txs));
-     $xml->writeElement('ControlSum', $this->formatCcy($sum));
+     $xml->writeElement('CtrlSum', $this->formatCcy($sum));
      $xml->startElement('PmtTpInf');
       $xml->startElement('SvcLvl');
        $xml->writeElement('Cd', 'SEPA');
@@ -203,14 +209,22 @@ class SEPALastschrift {
   }
 
   public function asXML() {
+   global $sepaLastschriftXMLVersion; # 008.002.02
+   global $sepaLastschriftXSD; # ../media/
     /** output */
    $xml = new XMLWriter;
    $xml->openMemory();
    $xml->startDocument('1.0', 'UTF-8');
 
+   $painVersion = "008.002.02";
+   if (isset($sepaLastschriftXMLVersion)) {
+     $painVersion = $sepaLastschriftXMLVersion;
+   }
+   $painXSDFile = "pain.".$painVersion.".xsd";
+
    $xml->startElement('Document');
-   $xml->writeAttribute('xmlns','urn:iso:std:iso:20022:tech:xsd:pain.008.003.02');
-   $xml->writeAttributeNS('xsi','schemaLocation','http://www.w3.org/2001/XMLSchema-instance','urn:iso:std:iso:20022:tech:xsd:pain.008.003.02 pain.008.003.02.xsd');
+   $xml->writeAttribute('xmlns','urn:iso:std:iso:20022:tech:xsd:pain.'.$painVersion);
+   $xml->writeAttributeNS('xsi','schemaLocation','http://www.w3.org/2001/XMLSchema-instance','urn:iso:std:iso:20022:tech:xsd:pain.'.$painVersion.' '.$painXSDFile);
     $xml->startElement('CstmrDrctDbtInitn');
      $this->addGrpHdr($xml);
      foreach ($this->txs as $type => $txs) {
@@ -220,6 +234,24 @@ class SEPALastschrift {
    $xml->endElement(); /* Document */
 
    $xml->endDocument();
-   return $xml->outputMemory(TRUE);
+   $xmlString = $xml->outputMemory(TRUE);
+
+   // verify xml
+   if (isset($sepaLastschriftXSD)) {
+     $xsdFile = $sepaLastschriftXSD."/".$painXSDFile;
+     if (!is_file($xsdFile)) {
+       add_message("Die Schema-Datei $xsdFile wurde nicht gefunden.");
+       return false;
+     } else {
+       $tempDom = new DOMDocument();
+       $tempDom->loadXML($xmlString);
+       if (!$tempDom->schemaValidate($xsdFile)) {
+         add_message("Die erzeugten Daten sind ungültig.");
+         return false;
+       }
+     }
+   }
+
+   return $xmlString;
   }
 }
