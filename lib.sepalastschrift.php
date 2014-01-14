@@ -42,11 +42,12 @@ class SEPALastschrift {
   private $creditorID = "missing"; /* Gläubiger-ID */
   private $ccy = "EUR"; /* EUR */
   private $txTypes = Array("FRST","RCUR","OOFF","FNAL");
+  private $cdtype = "CORE";
 
   /**
    * msgid ist ein Prefix, welches auch für sie Sammler (PmtInfId) als Prefix verwendet wird. Daher die Länge auf 29 beschränken!
    */
-  public function __construct($date /*class DateTime*/, $msgid, $initiator, $creditorName, $creditorIBAN, $creditorBIC, $creditorID /* GläubigerID */, $ccy="EUR") {
+  public function __construct($date /*class DateTime*/, $msgid, $initiator, $creditorName, $creditorIBAN, $creditorBIC, $creditorID /* GläubigerID */, $ccy="EUR", $cdtype="CORE" /* B2B or COR1 */) {
     $this->date = $date;
     $this->msgid = $msgid;
     $this->initiator = $initiator;
@@ -55,6 +56,7 @@ class SEPALastschrift {
     $this->creditorBIC = $creditorBIC;
     $this->creditorID = $creditorID;
     $this->ccy = $ccy;
+    $this->cdtype = $cdtype;
     if (!preg_match("#^([A-Za-z0-9]|[\+|\?|/|\-|:|\(|\)|\.|,|'| ]){1,29}$#", $msgid))
       die("ungültige msgid");
   }
@@ -99,7 +101,8 @@ class SEPALastschrift {
   private function addGrpHdr($xml) {
     $xml->startElement('GrpHdr');
      $xml->writeElement('MsgId', $this->msgid);
-     $xml->writeElement('CreDtTm', (new DateTime("now"))->format('Y-m-d\TH:i:s\Z'));
+     $dt = new DateTime("now");
+     $xml->writeElement('CreDtTm', $dt->format('Y-m-d\TH:i:s\Z'));
      $ctn = 0;
      foreach ($this->txs as $v) {
        $ctn += count($v);
@@ -131,7 +134,7 @@ class SEPALastschrift {
        $xml->writeElement('Cd', 'SEPA');
       $xml->endElement(); /* SvcLvl */
       $xml->startElement('LclInstrm');
-       $xml->writeElement('Cd', 'CORE');
+       $xml->writeElement('Cd', $this->cdtype);
       $xml->endElement(); /* LclInstrm */
       $xml->writeElement('SeqTp', $type);
      $xml->endElement(); /* PmtTpInf */
