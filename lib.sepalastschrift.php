@@ -77,10 +77,13 @@ class SEPALastschrift {
     if (strlen($subject) < 1 or strlen($subject) > 140)
      die("invalid subject length");
     # Sparkasse Arnstadt-Ilmenau erlaubt hier nur a-zA-Z0-9 sowie -':?,+()/. und Leerzeichen
-    if (!preg_match("#^([A-Za-z0-9]|[\+|\?|/|\-|:|\(|\)|\.|,|']| ){1,140}$#", $subject))
-      die("invalid subject $subject: #^([A-Za-z0-9]|[\+|\?|/|\-|:|\(|\)|\.|,|']| ){1,140}$#");
+    if (!preg_match("#^[A-Za-z0-9\+\?/\-:\(\)\.,' ]{1,140}$#", $subject))
+      die("invalid subject $subject: #^[A-Za-z0-9\+\?/\-:\(\)\.,' ]{1,140}$#");
     if (strlen($name) < 1 or strlen($name) > 70)
      die("invalid name length");
+    # Sparkasse Arnstadt-Ilmenau erlaubt hier nur a-zA-Z0-9 sowie -':?,+()/. und Leerzeichen
+    if (!preg_match("#^[A-Za-z0-9\+\?/\-:\(\)\.,' ]{1,70}$#", $name))
+      die("invalid name $name: #^[A-Za-z0-9\+\?/\-:\(\)\.,' ]{1,70}$#");
     if ($UltmtDbtr !== NULL && (strlen($UltmtDbtr) < 1 or strlen($UltmtDbtr) > 70))
      die("invalid UltmtDbtr length");
     if ($amount < 0.01 || $amount > 999999999.99) die("invalid amount $amount");
