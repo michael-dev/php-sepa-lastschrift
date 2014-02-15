@@ -84,7 +84,7 @@ class SEPALastschrift {
     if ($UltmtDbtr !== NULL && (strlen($UltmtDbtr) < 1 or strlen($UltmtDbtr) > 70))
      die("invalid UltmtDbtr length");
     if ($amount < 0.01 || $amount > 999999999.99) die("invalid amount $amount");
-    $amount = (int) ($amount * 100);
+    $amount = round($amount * 100);
     if (!in_array($type, $this->txTypes)) die("invalid type $type");
     $tx = Array("id" => $id, "IBAN" => $iban, "BIC" => $bic, "name" => $name, "mandate" => $mandate, "mandateSignatureDate" => $mandateSignatureDate, "amount" => $amount, "subject" => $subject);
     if ($UltmtDbtr !== NULL) $ts["UltmtDbtr"] = $UltmtDbtr;
