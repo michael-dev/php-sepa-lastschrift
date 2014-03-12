@@ -104,7 +104,7 @@ class SEPALastschrift {
   private function addGrpHdr($xml) {
     $xml->startElement('GrpHdr');
      $xml->writeElement('MsgId', $this->msgid);
-     $dt = new DateTime("now");
+     $dt = new DateTime("now", new DateTimeZone('Etc/UTC'));
      $xml->writeElement('CreDtTm', $dt->format('Y-m-d\TH:i:s\Z'));
      $ctn = 0;
      foreach ($this->txs as $v) {
