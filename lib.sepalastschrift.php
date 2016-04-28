@@ -43,11 +43,12 @@ class SEPALastschrift {
   private $ccy = "EUR"; /* EUR */
   private $txTypes = Array("FRST","RCUR","OOFF","FNAL");
   private $cdtype = "CORE";
+  private $BtchBookg = NULL;
 
   /**
    * msgid ist ein Prefix, welches auch für sie Sammler (PmtInfId) als Prefix verwendet wird. Daher die Länge auf 29 beschränken!
    */
-  public function __construct($date /*class DateTime*/, $msgid, $initiator, $creditorName, $creditorIBAN, $creditorBIC, $creditorID /* GläubigerID */, $ccy="EUR", $cdtype="CORE" /* B2B or COR1 */) {
+  public function __construct($date /*class DateTime*/, $msgid, $initiator, $creditorName, $creditorIBAN, $creditorBIC, $creditorID /* GläubigerID */, $ccy="EUR", $cdtype="CORE" /* B2B or COR1 */, $BtchBookg = NULL /* BatchBookingIndicator */) {
     $this->date = $date;
     $this->msgid = $msgid;
     $this->initiator = $initiator;
@@ -57,6 +58,7 @@ class SEPALastschrift {
     $this->creditorID = $creditorID;
     $this->ccy = $ccy;
     $this->cdtype = $cdtype;
+    $this->BtchBookg = $BtchBookg;
     if (!preg_match("#^([A-Za-z0-9]|[\+|\?|/|\-|:|\(|\)|\.|,|'| ]){1,29}$#", $msgid))
       die("ungültige msgid");
   }
@@ -130,6 +132,9 @@ class SEPALastschrift {
     $xml->startElement('PmtInf');
      $xml->writeElement('PmtInfId', $this->msgid.'-'.$type);
      $xml->writeElement('PmtMtd','DD');
+     if ($this->BtchBookg !== NULL) {
+       $xml->writeElement('BtchBookg', $this->BtchBookg ? "true" : "false");
+     }
      $xml->writeElement('NbOfTxs', count($txs));
      $xml->writeElement('CtrlSum', $this->formatCcy($sum));
      $xml->startElement('PmtTpInf');
