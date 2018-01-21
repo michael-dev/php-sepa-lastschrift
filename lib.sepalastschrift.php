@@ -155,13 +155,13 @@ class SEPALastschrift {
        $xml->writeElement('IBAN', $this->creditorIBAN);
       $xml->endElement(); /* Id */
      $xml->endElement(); /* CdtrAcct */
-    if ($this->creditorBIC !== NULL) {
      $xml->startElement('CdtrAgt');
       $xml->startElement('FinInstnId');
+    if ($this->creditorBIC !== NULL) {
        $xml->writeElement('BIC', $this->creditorBIC);
+    } // BIC !== NULL
       $xml->endElement(); /* FinInstnId */
      $xml->endElement(); /* CdtrAgt */
-    } // BIC !== NULL
      $xml->writeElement('ChrgBr', 'SLEV');
      $xml->startElement('CdtrSchmeId');
       $xml->startElement('Id');
@@ -197,13 +197,13 @@ class SEPALastschrift {
        /* No Amendment aka Change-Tracing supported! */
       $xml->endElement(); /* MndtRltdInf */
      $xml->endElement(); /* DrctDbtTx */
-    if ($tx["BIC"] !== NULL) {
      $xml->startElement('DbtrAgt');
       $xml->startElement('FinInstnId');
+    if ($tx["BIC"] !== NULL) {
        $xml->writeElement('BIC',$tx["BIC"]);
+    } // BIC !== null
       $xml->endElement(); /* FinInstnId */
      $xml->endElement(); /* DbtrAgt */
-    } // BIC !== null
      $xml->startElement('Dbtr');
       $xml->writeElement('Nm',$tx["name"]);
      $xml->endElement(); /* Dbtr */
