@@ -1,0 +1,20 @@
+{
+	"name" : "michael-dev/php-sepa-lastschrift",
+	"description" : "PHP SEPA (Sammel-)Lastschriften erzeugen (XML)",
+	"type" : "library",
+	"authors" : [{
+			"name" : "Michael Braun",
+			"email" : "michael-dev@fami-braun.de"
+		}
+	],
+	"homepage" : "https://github.com/michael-dev/php-sepa-lastschrift",
+	"license" : "LGPL-3.0+",
+	"minimum-stability" : "dev",
+	"keywords" : [
+		"SEPA",
+		"Lastschrift"
+	],
+	"autoload": {
+		"classmap": ["lib.sepalastschrift.php"]
+	}
+}
